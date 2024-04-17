@@ -1,0 +1,79 @@
+******************************
+* Docker Installation
+*******************************
+Update Local Database
+$ sudo apt-get update
+
+Download Dependencies
+$ sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+
+Add Docker’s GPG Key
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+Install the Docker Repository
+$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+
+Update Repositories
+$ sudo apt-get update
+
+Install Latest Version of Docker
+$ sudo apt-get install docker-ce
+
+Check the Docker version.
+$ docker version
+
+**********************************
+* Resolving permission issue
+*********************************
+Create the docker group.
+$ sudo groupadd docker
+Add your user to the docker group.
+$ sudo usermod -aG docker ${USER}
+Logout and log back
+Verify that you can run docker commands without sudo.
+
+*********************************
+* Running a 1-st Docker container
+*********************************
+
+$ docker run hello-world
+
+To see more information on the Docker running on the system, you can issue the following command
+$ docker info
+$ docker run -it centos /bin/bash
+
+*********************************
+* Docker images
+*********************************
+$ docker images
+$ docker run -it centos echo "hello"
+$ docker run -it centos yum install python2 -y
+
+To run multiply commands
+$  docker run -it centos /bin/bash -c "yum install python2 -y; python2 --version"
+
+Exercise 
+$  docker run -it centos /bin/bash -c "yum install python -y && echo Hello"
+To replace && to ; and to see what happens.
+
+$ docker images
+
+$ docker run mysql
+
+To delete a docker image
+$ docker rmi <image_id>
+$ docker rmi 30f937e841c8
+If you faced the issue use:
+$ docker rmi –f 30f937e841c8 (force removal of the image) 
+
+$ docker images -q
+$ docker inspect centos
+
+Next step is to create account in Docker hub
+https://hub.docker.com/
+
+$ docker pull jenkins
+
+To run Jenkins, you need to run the following command −
+
+$ docker run -p 8080:8080 -p 50000:50000 jenkins 
