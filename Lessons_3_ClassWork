@@ -1,0 +1,152 @@
+*******************************************************
+* Exercise building docker images with creating a different user
+******************************************************* 
+1) Create a docker image
+$ vim Dockerfile_test1
+--------------------------------------
+FROM centos
+
+MAINTAINER levintovich@yahoo.com
+
+# Create a new user "test"
+RUN mkdir -p /home/test
+RUN useradd -d /home/test test
+RUN chown -R test:test  /home/test/
+RUN touch /home/test/hello
+
+RUN whoami
+RUN su test
+RUN whoami
+RUN pwd
+RUN cd /home/test/
+RUN pwd
+
+CMD ["/bin/bash"]
+----------------------------------------------
+$ docker build -t=user_test_1 -f Dockerfile_test1 .
+$ docker run -it user_test_1
+****************************************************
+2) Create another image with fixed issues.
+$ vim Dockerfile_test2
+---------------------------------------
+FROM centos
+
+MAINTAINER levintovich@yahoo.com
+
+# Create a new user "test"
+RUN mkdir -p /home/test
+RUN useradd -d /home/test test
+RUN chown -R test:test  /home/test/
+RUN touch /home/test/hello
+
+RUN whoami
+RUN pwd
+USER test
+RUN whoami
+WORKDIR /home/test/
+RUN pwd
+
+CMD ["bash"]
+-------------------------------------------------
+docker build -t=user_test_2 -f Dockerfile_test2 .
+
+
+
+login into the Docker Hub repository from the command prompt.
+docker login 
+
+docker tag a2d50f87c47e levintovich/testrepo:1.0.1
+
+docker images | grep a2d50f87c47e
+
+docker push <repositoryname>
+docker push levintovich/testrepo:1.0.1
+
+-------------------------------
+Building a Web Server
+---------------------------------
+##################################################
+FROM ubuntu
+
+ENV TZ=Asia/Jerusalem 
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone 
+
+RUN apt update
+RUN apt install apache2 -y 
+RUN apt install apache2-utils -y
+RUN apt clean 
+EXPOSE 80 
+CMD ["apache2ctl", "-D", "FOREGROUND"]
+###################################################
+
+docker build -t="myfirstwebserver" .
+
+docker run -d -p 80:80 myfirstwebserver
+
+docker tag myfirstwebserver:latest levintovich/myfirstwebserver:latest
+docker push levintovich/myfirstwebserver:latest
+
+############################
+# Docker – Managing Ports
+#############################
+Docker – Managing Ports
+$ docker pull jenkins
+$ docker inspect <container / image>
+$ docker inspect jenkins
+
+$ docker run -p 8080:8080 -p 50000:50000 jenkins
+
+########################
+# Website
+#############################
+$ mkdir -p website
+$ cd website
+$ vim index.html
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My First Website</h1>
+
+<p>Hello World!</p>
+
+</body>
+</html>
+#####################################
+
+$ vim Dockerfile
+###########################################
+FROM levintovich/myfirstwebserver:latest
+
+COPY ./index.html /var/www/html/
+#############################################
+$ docker build -t="mywebsite:latest" .
+
+vladimir@slaveDocker:~/website$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES
+e9cdeb8f73e1        myfirstwebserver    "apache2ctl -D FOREG…"   30 hours ago        Up 11 hours         0.0.0.0:80->80/tcp   busy_gates
+vladimir@slaveDocker:~/website$ docker stop e9cdeb8f73e1
+e9cdeb8f73e1
+
+docker run -d -p 80:80 mywebsite:latest
+
+Debugging Apache:
+vladimir@slaveDocker:~/website$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                NAMES
+ca2a65aa2648        mywebsite:latest    "apache2ctl -D FOREG…"   About a minute ago   Up About a minute   0.0.0.0:80->80/tcp   youthful_mclaren
+vladimir@slaveDocker:~/website$ docker exec -it ca2a65aa2648 bash
+root@ca2a65aa2648:/#
+
+Let's update a docker image:
+$ vim Dockerfile
+###########################################
+FROM levintovich/myfirstwebserver:latest
+
+RUN apt install vim -y
+
+COPY ./index.html /var/www/html/
+#############################################
+$ docker build -t="mywebsite" .
+$ docker tag mywebsite mywebsite:1.0.2
+

@@ -1,0 +1,124 @@
+$ docker run -it centos /bin/bash
+$ docker ps
+$ docker ps -a
+
+$ docker history centos
+$ docker history jenkins
+
+Example
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+263e6f628822        centos              "/bin/bash"         8 seconds ago       Up 8 seconds                            charming_yalow
+
+$ docker stop 263e6f628822
+263e6f628822
+
+$ docker rm 263e6f628822
+
+To see the top processes within a container
+$ docker top <ContainerID>
+To stop a running container
+$ docker stop <ContainerID>
+
+---------------------------------
+$ docker stats <ContainerID> 
+
+------------------------------------
+$ docker attach <ContainerID> 
+-------------------------------------
+$ docker run -it centos /bin/bash
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+4844a06f8e08        centos              "/bin/bash"         7 seconds ago       Up 6 seconds                            priceless_agnesi
+$ docker attach 4844a06f8e08
+
+_____________________________-
+$ docker run -it centos /bin/bash
+Open a new session and type:
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+d5be0492ed34        centos              "/bin/bash"         10 seconds ago      Up 8 seconds                            jovial_lalande
+
+$ docker stop d5be0492ed34
+
+$ docker restart d5be0492ed34
+Come back to the previous session and type
+$ docker attach d5be0492ed34
+--------------------------------------------------------
+--------------------------------------------------------
+Docker files
+---------------------------------
+$ touch Dockerfile
+$ vim Dockerfile 
+
+#This is a sample Image 
+FROM ubuntu 
+MAINTAINER <your mail> 
+
+RUN apt-get update 
+RUN apt-get install nginx -y 
+CMD ["echo","Image created"]
+-----------------------------------------------------
+Docker Build
+----------------------------
+$ docker build  -t ImageName:TagName dir  
+
+$ docker build  -t myfirstimage:1.0.1 .
+
+$ docker rm $(docker ps -aq)
+
+login into the Docker Hub repository from the command prompt.
+
+docker tag a2d50f87c47e levintovich/testrepo:1.0.1
+
+docker images | grep a2d50f87c47e
+
+--------------------------------
+FROM centos
+MAINTAINER levintovich@yahoo.com
+
+
+RUN yum install  python3 -y
+CMD ["echo","Python3 has been installed"]
+CMD ["python3"]
+-------------------------------------------
+
+
+docker push <repositoryname>
+Enter your repository name instead of levintovich/testrepo
+docker push levintovich/testrepo:1.0.1
+
+docker rename CONTAINER NEW_NAME
+
+docker rename nervous_ritchie ubuntu_1
+# to see 5 last containers
+docker ps -a | head -n 5
+docker start ubuntu_1
+docker ps
+# option 1 to connect to the running container
+docker attach ubuntu_1
+exit
+docker ps
+docker start ubuntu_1
+docker exec -it ubuntu_1 bash
+
+
+docker ps
+docker stop ubuntu_1
+docker start ubuntu_1; docker exec -it ubuntu_1 bash
+docker start ubuntu_1 && docker exec -it ubuntu_1 bash
+
+docker ps -aq
+docker rm $(docker ps -aq)
+docker ps
+docker ps -a
+docker ps -aq
+docker stop $(docker ps -aq)
+docker ps
+docker rm $(docker ps -aq)
+docker ps -a
+history
+
+
+
+

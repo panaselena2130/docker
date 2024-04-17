@@ -1,0 +1,7 @@
+1) To install GCC compiler on ubuntu/centos containers.
+2) To create Jenkins job using a slave node where docker is installed with parameter OS (ubuntu/centos) and run these containers by performing the following commands:
+- to install gcc (C compiler)
+- to print gcc version
+- after you manage to implement 2 commands to add 3-d command with attempting  to compile something. It doesn't matter if you face an error. 
+3) To continue to work with Jenkins as a container (option)
+  
