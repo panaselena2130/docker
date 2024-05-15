@@ -1,0 +1,6 @@
+1) to build the website on centos and push it to Docker Hub.
+2) To add to the images python installation as well.
+3) To update the image with a python script (to add a python script in order to run it at the container)
+4) To add vim to 2 images: to ubuntu and also to centos.
+5) to add gcc compiler (installation) to images.
+6) To add user tester to these images and to set working directory as tester home directory
