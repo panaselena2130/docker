@@ -1,0 +1,141 @@
+**********************************************
+* Homework
+****************************************
+$ git clone https://github.com/Levintovich/JenkinsCourse.git
+$ cd JenkinsCourse
+$ docker build -t ubuntu_python -f docker/Dockerfie_arg --build-arg language=python .
+$ docker build -t ubuntu_bash -f docker/Dockerfie_arg --build-arg language=bash .
+$ docker build -t ubuntu_all -f docker/Dockerfie_arg --build-arg language=all .
+
+*************************************
+* Setting NGINX
+**************************************
+docker pull nginx
+docker run -d -p 8080:80 nginx
+Go to browser: http://slave01-docker:8080/
+Create a file sample.html and copy it to volume folder.
+cd volume
+docker run -p 8080:80 -v "$PWD":/usr/share/nginx/html:ro -d nginx
+docker run -p 8080:80 -v "$PWD":/usr/share/nginx/html:rw -d nginx
+
+Check 3 URLs:
+http://slave01-docker:8080/
+http://slave01-docker:8080/sample.html
+http://slave01-docker:8080/index.html
+
+*************************************
+* Setting MongoDB
+**************************************
+MongoDB is a famous document-oriented database that is used by 
+many modern-day web applications.
+
+1) $ docker pull mongo
+2) Create a /mongodata directory on the host system:
+sudo mkdir -p /mongodata
+
+3) The /data/db directory in the container is mounted as /mongodata on the host. 
+Additionally, this command changes the name of the container to mongodb:
+docker run -it -v /mongodata:/data/db --name mongodb -d mongo 
+--name mongodb - to set the container name as mongodb.
+vladimir@slave01-docker:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+598aada4bd75        mongo               "docker-entrypoint.s…"   6 seconds ago       Up 5 seconds        27017/tcp           mongodb
+27017 - port for MongDB.
+4) Always check the Docker log to see the chain of events after making changes:
+docker logs mongodb
+5) The container is currently running in detached mode. 
+Connect to the container using the interactive terminal instead:
+$ docker exec -it mongodb bash
+6) Start the MongoDB shell by typing mongo in the interactive terminal.
+root@598aada4bd75:/# mongo
+MongoDB shell version v4.2.8
+7) Instead of just typing mongo, you can additionally define a specific 
+host and port by typing:
+mongo -host localhost -port 27017  
+8) With the MongoDB shell, you can now create a database, 
+add collections or manage individual documents.
+
+> use DATABASE_TEST
+switched to db DATABASE_TEST
+> db
+DATABASE_TEST
+> show dbs
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+----------------------------------
+> exit
+
+*************************************
+* Docker Compose
+**************************************
+Docker Compose is used to run multiple containers as a single service. 
+For example, suppose you had an application which required NGNIX and MySQL, 
+you could create one file which would start both the containers as a service 
+without the need to start each one separately.
+1) Download Docker Compose release from GitHub.
+$  sudo curl -L \
+https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s \
+`-`uname -m` -o /usr/local/bin/docker-compose
+$ sudo chmod +x /usr/local/bin/docker-compose
+$ docker-compose --version
+docker-compose version 1.21.2, build a133471
+2) Create the first Docker Compose file. All Docker Compose files are YAML files.
+There are several versions of the Compose file format – 1, 2, 2.x, and 3.x
+We will created version 2. 
+$ vim docker-compose.yml 
+--------------------------------
+version: '2'
+services:
+  databases:
+    image: mysql
+    ports:
+    - "3306:3306"
+    environment:
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_USER=user
+    - MYSQL_PASSWORD=password
+    - MYSQL_DATABASE=demodb
+  web:
+    image: nginx
+	ports:
+    - 80:80
+    volumes:
+    - /home/vladimir/Documents/volume:/usr/share/nginx/html:ro
+---------------------------------------------------------------
+3)Run the Docker Compose file using the following command −
+$ docker-compose up
+vladimir@slave01-docker:~$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                               NAMES
+ed4a03763707        nginx               "/docker-entrypoint.…"   57 seconds ago      Up 11 seconds       0.0.0.0:80->80/tcp                  vladimir_web_1
+bab2e82afb09        mysql               "docker-entrypoint.s…"   4 minutes ago       Up 10 seconds       0.0.0.0:3306->3306/tcp, 33060/tcp   vladimir_databases_1
+
+4) Connect to the mysql container using the interactive terminal:
+$ docker exec -it vladimir_databases_1 bash
+root@bab2e82afb09:/# mysql -u user -p
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| demodb             |
+| information_schema |
++--------------------+
+2 rows in set (0.01 sec)
+
+mysql>exit
+
+5) Connect to the nginx container using the interactive terminal:
+$ docker exec -it vladimir_web_1 bash
+root@ed4a03763707:/# cd /usr/share/nginx/html
+root@ed4a03763707:/usr/share/nginx/html# ls
+Try to edit index.html and see what happens.
+ echo "<p>Edit line</p>" >> index.html
+6) Edit yml file and change to rw:
+$ cp docker-compose.yml docker-compose_rw.yml
+Change the line to: - /home/vladimir/Documents/volume:/usr/share/nginx/html:rw
+
+$  docker-compose -f docker-compose_rw.yml up
+Try to edit index.html and see what happens.
+ echo "<p>Edit line</p>" >> index.html
+ 
+ 	

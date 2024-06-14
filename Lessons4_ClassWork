@@ -1,0 +1,65 @@
+############################
+#pipeline CI-CD_with_Docker
+###########################
+input params:
+NAME
+REPO_NAME
+repository: https://github.com/Levintovich/JenkinsCourse.git
+Pipeline location: docker/Jenkinsfile
+
+login to your docker machine and define as a Jenkins node (slave)
+
+$ docker login
+
+Run the pipeline
+
+$ docker logout
+
+Run the pipeline and see what happened.
+
+###################################
+#pipeline CI-CD_with_Docker_secured
+###################################
+copy the job from the previous pipeline
+input params: 
+NAME
+DOCKER_HUB_NAME
+
+repository: https://github.com/Levintovich/JenkinsCourse.git
+Pipeline location: docker/Jenkinsfile_credentials
+
+Create 2 credentials:
+		DOCKERHUB_USER
+		DOCKERHUB_PASSWORD
+		
+		
+#################################
+# Docker additional instructions
+##################################
+$ git clone https://github.com/Levintovich/JenkinsCourse.git
+$ cd JenkinsCourse
+$ docker build -t pytonapp -f ./docker/Dockerfile_python .
+$ docker run pytonapp
+$ docker run -it pytonapp bash
+root@6e1f5c5b78c5:/container_scripts# env
+Expected outputs:
+root@6e1f5c5b78c5:/container_scripts# echo $PLACE
+RTG
+root@6e1f5c5b78c5:/container_scripts# echo $COURSE
+DOCKER
+
+
+
+$ docker build -t pytonapp_entry_point -f ./docker/Dockerfile_entry_point .
+$ docker run pytonapp_entry_point John
+$ docker run pytonapp_entry_point Jack
+$ docker run pytonapp_entry_point Jill
+
+########################
+# Data Volumes
+#####################
+$ docker pull levintovich/mywebsite:latest
+$ mkdir -p ${HOME}/Documents/volume
+$ docker run -d -v ${HOME}/Documents/volume:/var/www/html/ -p 80:80 levintovich/mywebsite:latest
+Copy index.html file to ${HOME}/Documents/volume
+Now you can modify index.html and your website will be changed.
